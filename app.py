@@ -222,7 +222,7 @@ if __name__ == '__main__':
     print("🎓 Student Academic Portal")
     print("=" * 60)
     print("Starting Flask server...")
-    print("Open your browser at: http://localhost:5000")
+    print("Open your browser at: http://localhost:8000")
     print("=" * 60)
     
-    app.run(debug=True, port=5000, host='0.0.0.0')
+    app.run(debug=True, port=8000, host='0.0.0.0')
