@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - Student Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-file-alt"></i> Reports</h1>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>System Summary</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Total Students:</strong> <span class="badge bg-info">{{ students | length }}</span></p>
+                <p><strong>Total Courses:</strong> <span class="badge bg-info">{{ courses | length }}</span></p>
+                <p><strong>At-Risk Students:</strong> <span class="badge bg-danger">{{ at_risk | length }}</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5>Report Generation</h5>
+            </div>
+            <div class="card-body">
+                <p>Generate comprehensive reports for analysis and monitoring:</p>
+                <button class="btn btn-sm btn-primary" onclick="generateStudentReport()">
+                    <i class="fas fa-download"></i> Student Report
+                </button>
+                <button class="btn btn-sm btn-success" onclick="generateCourseReport()">
+                    <i class="fas fa-download"></i> Course Report
+                </button>
+                <button class="btn btn-sm btn-warning" onclick="generateAtRiskReport()">
+                    <i class="fas fa-download"></i> At-Risk Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5>At-Risk Students Alert</h5>
+            </div>
+            <div class="card-body">
+                {% if at_risk %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Email</th>
+                                    <th>Current Average</th>
+                                    <th>Risk Level</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in at_risk %}
+                                <tr class="table-danger">
+                                    <td>{{ student.name }}</td>
+                                    <td>{{ student.email }}</td>
+                                    <td>{{ "%.2f"|format(student.current_avg) }}%</td>
+                                    <td><span class="badge bg-danger">{{ student.risk_level }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-success"><i class="fas fa-check"></i> No at-risk students</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function generateStudentReport() {
+        alert('Student Report: Generated successfully!\n\nThis would download a comprehensive student performance report.');
+    }
+
+    function generateCourseReport() {
+        alert('Course Report: Generated successfully!\n\nThis would download a comprehensive course analysis report.');
+    }
+
+    function generateAtRiskReport() {
+        alert('At-Risk Report: Generated successfully!\n\nThis would download a report of at-risk students needing intervention.');
+    }
+</script>
+{% endblock %}

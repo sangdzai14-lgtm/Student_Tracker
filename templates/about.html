@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}About - Student Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-info-circle"></i> About This System</h1>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h2>University Course Performance Tracker & Grade Prediction System</h2>
+            </div>
+            <div class="card-body">
+                <h5>Project ID</h5>
+                <p><strong>TEC004/05</strong></p>
+
+                <h5>Project Description</h5>
+                <p>
+                    A comprehensive Python application for managing student academic records, processing grade data 
+                    from various file formats, storing in a database, performing statistical analysis on academic 
+                    performance, and using machine learning to predict final grades.
+                </p>
+
+                <h5>Key Features</h5>
+                <ul>
+                    <li><strong>OOP Grade Management:</strong> Abstract Person class hierarchy with Student and Instructor</li>
+                    <li><strong>Multiple Grading Schemes:</strong> Weighted, curved, and pass/fail grading systems</li>
+                    <li><strong>File I/O:</strong> Import grades from CSV files, export reports to JSON</li>
+                    <li><strong>SQLite Database:</strong> Comprehensive relational database for students, courses, grades</li>
+                    <li><strong>Data Analytics:</strong> Pandas-based analysis with grade distributions and correlations</li>
+                    <li><strong>Data Visualization:</strong> MatPlotLib charts for grade analysis</li>
+                    <li><strong>AI Grade Prediction:</strong> Linear Regression model for predicting final grades</li>
+                    <li><strong>At-Risk Student Alerts:</strong> Automatic identification of students needing support</li>
+                    <li><strong>Web Portal:</strong> Flask-based web interface for data entry and reporting</li>
+                </ul>
+
+                <h5>Technology Stack</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Backend</h6>
+                        <ul>
+                            <li>Python 3.8+</li>
+                            <li>Flask Web Framework</li>
+                            <li>SQLite Database</li>
+                            <li>Pandas Data Analysis</li>
+                            <li>Scikit-learn ML</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Frontend</h6>
+                        <ul>
+                            <li>HTML5 Templates</li>
+                            <li>Bootstrap 5 CSS</li>
+                            <li>Chart.js Visualization</li>
+                            <li>JavaScript</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h5>Learning Outcomes</h5>
+                <ul>
+                    <li>Master Object-Oriented Programming principles</li>
+                    <li>Implement inheritance and polymorphism</li>
+                    <li>Work with relational databases and SQL</li>
+                    <li>Perform statistical analysis with Pandas</li>
+                    <li>Build machine learning models</li>
+                    <li>Create web applications with Flask</li>
+                    <li>Implement secure data management practices</li>
+                </ul>
+
+                <h5>Development Phases</h5>
+                <ol>
+                    <li><strong>Phase 1:</strong> OOP Design & Database Schema</li>
+                    <li><strong>Phase 2:</strong> Analytics & Visualization</li>
+                    <li><strong>Phase 3:</strong> AI Prediction & Integration</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert alert-success">
+            <h5><i class="fas fa-check-circle"></i> System Status: Operational</h5>
+            <p>The system is fully functional with sample data for demonstration purposes.</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

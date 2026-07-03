@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Students - Student Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-users"></i> Students</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Major</th>
+                                <th>GPA</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td>{{ student.student_id }}</td>
+                                <td>{{ student.name }}</td>
+                                <td>{{ student.email }}</td>
+                                <td>{{ student.major }}</td>
+                                <td>
+                                    <span class="badge {% if student.gpa >= 3.5 %}bg-success{% elif student.gpa >= 3.0 %}bg-info{% elif student.gpa >= 2.0 %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ "%.2f"|format(student.gpa) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="/student/{{ student.student_id }}" class="btn btn-sm btn-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

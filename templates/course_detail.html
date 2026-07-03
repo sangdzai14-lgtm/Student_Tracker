@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.course_name }} - Student Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-book-open"></i> {{ course.course_name }}</h1>
+        <p class="text-muted">{{ course.course_id }}</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h6>Credits</h6>
+                <h3>{{ course.credits }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h6>Enrolled Students</h6>
+                <h3>{{ stats.student_count }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h6>Average Grade</h6>
+                <h3>{{ "%.2f"|format(stats.avg_grade) }}%</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <h6>Pass Rate</h6>
+                <h3>{{ "%.1f"|format(stats.pass_rate) }}%</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5>Class Statistics</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Maximum Grade:</strong> <span class="badge bg-success">{{ stats.max_grade }}%</span></p>
+                <p><strong>Minimum Grade:</strong> <span class="badge bg-danger">{{ stats.min_grade }}%</span></p>
+                <p><strong>Standard Deviation:</strong> <span class="badge bg-info">{{ "%.2f"|format(stats.std_dev) }}</span></p>
+                <p><strong>Median Grade:</strong> <span class="badge bg-info">{{ "%.2f"|format(stats.median_grade) }}%</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5>Grade Correlation Analysis</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Midterm-Final Correlation:</strong> <span class="badge bg-info">{{ "%.3f"|format(correlation.correlation) }}</span></p>
+                <p><strong>R-Squared Value:</strong> <span class="badge bg-info">{{ "%.3f"|format(correlation.r_squared) }}</span></p>
+                <p><strong>Sample Size:</strong> <span class="badge bg-info">{{ correlation.sample_size }}</span></p>
+                <p class="small text-muted mt-2">
+                    Positive correlation indicates students who perform well on midterms tend to perform well on finals.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>Enrolled Students & Grades</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Student</th>
+                                <th>Midterm</th>
+                                <th>Final</th>
+                                <th>Assignments</th>
+                                <th>Final Grade</th>
+                                <th>Letter</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for grade in grades %}
+                            <tr>
+                                <td>
+                                    <a href="/student/{{ grade.student_id }}">{{ grade.name }}</a>
+                                </td>
+                                <td>{{ "%.2f"|format(grade.midterm) }}%</td>
+                                <td>{{ "%.2f"|format(grade.final) }}%</td>
+                                <td>{{ "%.2f"|format(grade.assignments) }}%</td>
+                                <td>
+                                    <span class="badge {% if grade.final_grade >= 90 %}bg-success{% elif grade.final_grade >= 80 %}bg-info{% elif grade.final_grade >= 70 %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ "%.2f"|format(grade.final_grade) }}%
+                                    </span>
+                                </td>
+                                <td><strong>{{ grade.letter_grade }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <a href="/courses" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Courses</a>
+    </div>
+</div>
+{% endblock %}

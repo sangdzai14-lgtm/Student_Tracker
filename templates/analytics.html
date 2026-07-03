@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Student Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-chart-bar"></i> Analytics Dashboard</h1>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>Course Performance Overview</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="courseStatsChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-exclamation-circle"></i> At-Risk Students (Below 70%)</h5>
+            </div>
+            <div class="card-body">
+                {% if at_risk %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Email</th>
+                                    <th>Current Average</th>
+                                    <th>Risk Level</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in at_risk %}
+                                <tr>
+                                    <td><a href="/student/{{ student.student_id }}">{{ student.name }}</a></td>
+                                    <td>{{ student.email }}</td>
+                                    <td>
+                                        <span class="badge {% if student.current_avg >= 70 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ "%.2f"|format(student.current_avg) }}%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if student.risk_level == 'High' %}bg-danger{% else %}bg-warning{% endif %}">
+                                            {{ student.risk_level }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-success"><i class="fas fa-check-circle"></i> No at-risk students identified!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert alert-info">
+            <h5><i class="fas fa-info-circle"></i> Analytics Information</h5>
+            <p>This dashboard provides real-time insights into academic performance across all courses:</p>
+            <ul>
+                <li><strong>Course Performance:</strong> Average grades and enrollment statistics</li>
+                <li><strong>At-Risk Identification:</strong> Students below 70% threshold</li>
+                <li><strong>Statistical Analysis:</strong> Grade distributions and correlations</li>
+                <li><strong>Trend Analysis:</strong> Performance trends over time</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function renderCourseStatsChart() {
+        let courseStats = {{ course_stats | safe }};
+
+        try {
+            const response = await fetch('/api/course-stats');
+            if (response.ok) {
+                courseStats = await response.json();
+            }
+        } catch (error) {
+            console.log('Chart data pending:', error);
+        }
+
+        if (!courseStats || courseStats.length === 0) {
+            return;
+        }
+
+        const ctx = document.getElementById('courseStatsChart');
+        if (!ctx) {
+            return;
+        }
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: courseStats.map(c => c.course_name),
+                datasets: [
+                    {
+                        label: 'Average Grade (%)',
+                        data: courseStats.map(c => c.avg_grade),
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+
+    renderCourseStatsChart();
+</script>
+{% endblock %}

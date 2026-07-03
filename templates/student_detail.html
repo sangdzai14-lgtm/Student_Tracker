@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}{{ student.name }} - Student Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-user-graduate"></i> {{ student.name }}</h1>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>Student Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Student ID:</strong> {{ student.student_id }}</p>
+                <p><strong>Email:</strong> {{ student.email }}</p>
+                <p><strong>Major:</strong> {{ student.major }}</p>
+                <p><strong>GPA:</strong> <span class="badge bg-info">{{ "%.2f"|format(stats.gpa) }}</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5>Academic Statistics</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Courses Enrolled:</strong> {{ stats.course_count }}</p>
+                <p><strong>Average Grade:</strong> <span class="badge bg-info">{{ "%.2f"|format(stats.average_grade) }}%</span></p>
+                <p><strong>Best Grade:</strong> <span class="badge bg-success">{{ "%.2f"|format(stats.best_grade) }}%</span></p>
+                <p><strong>Worst Grade:</strong> <span class="badge bg-warning">{{ "%.2f"|format(stats.worst_grade) }}%</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5>Enrolled Courses</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Course ID</th>
+                                <th>Course Name</th>
+                                <th>Credits</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for grade in grades %}
+                            <tr>
+                                <td>{{ grade.course_id }}</td>
+                                <td>{{ grade.course_name }}</td>
+                                <td>
+                                    {% set course = courses | selectattr('course_id', 'equalto', grade.course_id) | first %}
+                                    {% if course %}{{ course.credits }}{% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge {% if grade.final_grade >= 90 %}bg-success{% elif grade.final_grade >= 80 %}bg-info{% elif grade.final_grade >= 70 %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ "%.2f"|format(grade.final_grade) }}% ({{ grade.letter_grade }})
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5>Grade Breakdown (Latest Course)</h5>
+            </div>
+            <div class="card-body">
+                {% if grades %}
+                    {% set latest = grades[0] %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h6>Midterm</h6>
+                                <h4><span class="badge bg-info">{{ "%.2f"|format(latest.midterm) }}%</span></h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h6>Assignments</h6>
+                                <h4><span class="badge bg-info">{{ "%.2f"|format(latest.assignments) }}%</span></h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h6>Final Exam</h6>
+                                <h4><span class="badge bg-info">{{ "%.2f"|format(latest.final) }}%</span></h4>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p>No grades recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <a href="/students" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Students</a>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const trend = {{ trend | safe }};
+    if (trend && trend.length > 0) {
+        const labels = trend.map(t => t.course);
+        const data = trend.map(t => t.grade);
+        
+        console.log('Grade Trend:', labels, data);
+    }
+</script>
+{% endblock %}

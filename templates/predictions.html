@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Grade Prediction - Student Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-brain"></i> AI Grade Prediction</h1>
+        <p class="text-muted">Predict final grades based on midterm scores and assignment performance</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5>Grade Prediction Model</h5>
+            </div>
+            <div class="card-body">
+                <form id="predictionForm">
+                    <div class="mb-3">
+                        <label for="midtermScore" class="form-label">Midterm Score (%)</label>
+                        <input type="number" class="form-control" id="midtermScore" min="0" max="100" step="0.5" value="75" required>
+                        <small class="form-text text-muted">Enter midterm exam score (0-100)</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="assignmentsScore" class="form-label">Assignments Score (%)</label>
+                        <input type="number" class="form-control" id="assignmentsScore" min="0" max="100" step="0.5" value="80" required>
+                        <small class="form-text text-muted">Enter average assignment score (0-100)</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-magic"></i> Predict Final Grade
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5>Prediction Result</h5>
+            </div>
+            <div class="card-body" id="resultContainer" style="display: none;">
+                <div class="text-center">
+                    <h6>Predicted Final Grade</h6>
+                    <h1 id="predictedGrade" class="display-4" style="color: #28a745;">-</h1>
+                    <p class="text-muted">Confidence: <span id="confidence">-</span>%</p>
+                    
+                    <hr>
+                    
+                    <h6>Model Insights</h6>
+                    <p>
+                        <strong>Midterm Weight:</strong> <span id="midtermWeight" class="badge bg-info">0</span><br>
+                        <strong>Assignments Weight:</strong> <span id="assignmentsWeight" class="badge bg-info">0</span>
+                    </p>
+
+                    <div id="riskAlert" style="display: none;">
+                        <div class="alert alert-warning mt-3">
+                            <strong><i class="fas fa-exclamation-triangle"></i> At-Risk Alert!</strong><br>
+                            This prediction indicates the student is at risk of failing this course.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body" id="noResultContainer">
+                <p class="text-muted text-center">
+                    <i class="fas fa-chart-line"></i><br>
+                    Enter midterm and assignment scores to generate a prediction
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5>How It Works</h5>
+            </div>
+            <div class="card-body">
+                <h6>Prediction Algorithm</h6>
+                <p>
+                    This AI-powered prediction model uses Linear Regression trained on historical grade data to predict 
+                    final exam scores based on:
+                </p>
+                <ul>
+                    <li><strong>Midterm Exam Performance:</strong> Indicator of fundamental understanding</li>
+                    <li><strong>Assignment Completion Rate:</strong> Indicator of consistent effort and engagement</li>
+                </ul>
+                <p class="text-muted small">
+                    The model analyzes patterns from all students across all courses to create a prediction that helps 
+                    identify students who may need additional support.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const midterm = parseFloat(document.getElementById('midtermScore').value);
+        const assignments = parseFloat(document.getElementById('assignmentsScore').value);
+
+        try {
+            const response = await fetch('/api/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    midterm: midterm,
+                    assignments: assignments
+                })
+            });
+
+            const data = await response.json();
+
+            // Show result container
+            document.getElementById('resultContainer').style.display = 'block';
+            document.getElementById('noResultContainer').style.display = 'none';
+
+            // Display prediction
+            document.getElementById('predictedGrade').textContent = data.predicted_grade.toFixed(2) + '%';
+            document.getElementById('confidence').textContent = (data.confidence * 100).toFixed(0);
+            document.getElementById('midtermWeight').textContent = data.midterm_weight.toFixed(3);
+            document.getElementById('assignmentsWeight').textContent = data.assignments_weight.toFixed(3);
+
+            // Show risk alert if prediction is below 70
+            if (data.predicted_grade < 70) {
+                document.getElementById('riskAlert').style.display = 'block';
+            } else {
+                document.getElementById('riskAlert').style.display = 'none';
+            }
+
+            // Change color based on prediction
+            const gradeElement = document.getElementById('predictedGrade');
+            if (data.predicted_grade >= 90) {
+                gradeElement.style.color = '#28a745';  // Green
+            } else if (data.predicted_grade >= 80) {
+                gradeElement.style.color = '#007bff';  // Blue
+            } else if (data.predicted_grade >= 70) {
+                gradeElement.style.color = '#ffc107';  // Yellow
+            } else {
+                gradeElement.style.color = '#dc3545';  // Red
+            }
+
+        } catch (error) {
+            console.error('Prediction error:', error);
+            alert('Error generating prediction. Please try again.');
+        }
+    });
+</script>
+{% endblock %}

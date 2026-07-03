@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Student Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+        <p class="text-muted">University Course Performance Tracker & Grade Prediction System</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Students</h5>
+                <h2>{{ total_students }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Courses</h5>
+                <h2>{{ total_courses }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <h5 class="card-title">At-Risk Students</h5>
+                <h2>{{ at_risk_count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">System Status</h5>
+                <h2><span class="badge bg-success">Active</span></h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-star"></i> Top Performers</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for performer in top_performers %}
+                    <a href="/student/{{ performer.student_id }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ performer.name }}</h6>
+                            <span class="badge bg-success">{{ performer.grade }}%</span>
+                        </div>
+                        <p class="mb-1 small">{{ performer.course }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-exclamation-triangle"></i> Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Project:</strong> TEC004/05</p>
+                <p><strong>Title:</strong> University Course Performance Tracker & Grade Prediction System</p>
+                <p><strong>Features:</strong></p>
+                <ul class="small">
+                    <li>OOP Grade Management</li>
+                    <li>SQLite Database</li>
+                    <li>Pandas Analytics</li>
+                    <li>AI Grade Prediction</li>
+                    <li>Real-time Reports</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-book"></i> Quick Navigation</h5>
+            </div>
+            <div class="card-body">
+                <div class="btn-group" role="group">
+                    <a href="/students" class="btn btn-outline-primary"><i class="fas fa-users"></i> View All Students</a>
+                    <a href="/courses" class="btn btn-outline-success"><i class="fas fa-book"></i> View All Courses</a>
+                    <a href="/analytics" class="btn btn-outline-info"><i class="fas fa-chart-bar"></i> Analytics</a>
+                    <a href="/predictions" class="btn btn-outline-warning"><i class="fas fa-brain"></i> Predictions</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
