@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Core Failure | 500 Error{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex flex-col items-center justify-center text-center" data-aos="zoom-in">
+    <div class="relative mb-12">
+        <h1 class="text-[12rem] font-black tracking-tighter leading-none opacity-5 text-danger">500</h1>
+        <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-32 h-32 bg-danger/20 rounded-[3rem] border border-danger/30 flex items-center justify-center">
+                <i data-lucide="zap-off" class="w-12 h-12 text-danger animate-pulse"></i>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="text-3xl font-black tracking-tighter mb-4 text-white">System Critical Error</h2>
+    <p class="text-slate-500 max-w-sm mx-auto mb-12 font-medium">An unexpected exception occurred within the neural processing pipeline.</p>
+
+    <div class="flex gap-4">
+        <button onclick="window.location.reload()" class="px-12 py-4 bg-white/5 border border-white/10 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-white/10 transition-all">
+            Retry Pulse
+        </button>
+        <a href="/" class="px-12 py-4 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg hover:shadow-primary/50 transition-all active:scale-[0.98]">
+            Reset Logic
+        </a>
+    </div>
+</div>
+{% endblock %}

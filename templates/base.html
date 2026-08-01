@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Academic Intelligence | AI Portal 2026{% endblock %}</title>
+
+    <!-- Scripts & Frameworks -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        border: "hsl(var(--border))",
+                        input: "hsl(var(--border))",
+                        ring: "hsl(var(--ring))",
+                        background: "#020617",
+                        foreground: "#f8fafc",
+                        primary: {
+                            DEFAULT: "#38bdf8",
+                            foreground: "#020617",
+                        },
+                        secondary: {
+                            DEFAULT: "#1e293b",
+                            foreground: "#f8fafc",
+                        },
+                        accent: {
+                            DEFAULT: "#818cf8",
+                            foreground: "#f8fafc",
+                        },
+                        glass: "rgba(15, 23, 42, 0.65)",
+                    },
+                    borderRadius: {
+                        lg: "var(--radius)",
+                        md: "calc(var(--radius) - 2px)",
+                        sm: "calc(var(--radius) - 4px)",
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- Icons & Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Animation Libraries -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
+
+    <!-- Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --radius: 0.75rem;
+            --border: 214.3 31.8% 91.4%;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .brand-font {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Loading Screen */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #020617;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .glass-morphism {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .bg-gradient-mesh {
+            background: radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0, transparent 50%),
+                        radial-gradient(at 100% 0%, rgba(129, 140, 248, 0.15) 0, transparent 50%),
+                        radial-gradient(at 100% 100%, rgba(34, 197, 94, 0.1) 0, transparent 50%),
+                        radial-gradient(at 0% 100%, rgba(239, 68, 68, 0.1) 0, transparent 50%);
+        }
+
+        .animated-gradient-text {
+            background: linear-gradient(to right, #38bdf8, #818cf8, #34d399, #38bdf8);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: gradient-text 4s linear infinite;
+        }
+
+        @keyframes gradient-text {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        /* Smooth Scroll (Lenis) */
+        html.lenis {
+            height: auto;
+        }
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
+        }
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+
+        /* Hover Transitions */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-5px) scale(1.01);
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link-futuristic {
+            position: relative;
+        }
+        .nav-link-futuristic::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #38bdf8;
+            transition: width 0.3s;
+        }
+        .nav-link-futuristic:hover::after {
+            width: 100%;
+        }
+
+        /* Table Styling */
+        .f-table tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .f-table tr:last-child {
+            border-bottom: none;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-background text-foreground antialiased selection:bg-primary/30">
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="flex flex-col items-center">
+            <div class="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="animated-gradient-text font-bold text-xl tracking-tighter brand-font">AI ACADEMIC PORTAL</p>
+        </div>
+    </div>
+
+    <!-- Background mesh -->
+    <div class="fixed inset-0 bg-gradient-mesh pointer-events-none -z-10"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-4 glass-morphism border-b border-white/10">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 group">
+                <div class="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                    <i data-lucide="brain-circuit" class="text-primary w-6 h-6"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tighter brand-font text-white">
+                    ACADEMIC<span class="text-primary">.AI</span>
+                </span>
+            </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center gap-8">
+                <a href="/presentation" class="nav-link-futuristic text-sm font-black text-primary animate-pulse uppercase tracking-widest">Showroom</a>
+                <a href="/intelligence" class="nav-link-futuristic text-sm font-medium text-slate-400 hover:text-white transition-colors">Behavior AI</a>
+                <a href="/" class="nav-link-futuristic text-sm font-medium text-slate-400 hover:text-white transition-colors">Dashboard</a>
+                <a href="/students" class="nav-link-futuristic text-sm font-medium text-slate-400 hover:text-white transition-colors">Students</a>
+                <a href="/courses" class="nav-link-futuristic text-sm font-medium text-slate-400 hover:text-white transition-colors">Courses</a>
+                <a href="/analysis" class="nav-link-futuristic text-sm font-medium text-slate-400 hover:text-white transition-colors">Analysis</a>
+                <a href="/predictions" class="nav-link-futuristic text-sm font-medium text-slate-400 hover:text-white transition-colors">Predictions</a>
+                <a href="/scraper" class="px-4 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold hover:opacity-90 transition-all">
+                    RUN SCRAPER
+                </a>
+            </div>
+
+            <!-- Mobile Toggle -->
+            <button class="md:hidden text-white">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-24 pb-12 px-6 max-w-7xl mx-auto min-h-screen">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 py-12 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2 opacity-50">
+                <i data-lucide="graduation-cap" class="w-5 h-5 text-primary"></i>
+                <span class="text-sm font-medium">TEC-004 Academic Intelligence © 2026</span>
+            </div>
+            <div class="flex gap-6 text-slate-500 text-sm">
+                <a href="/about" class="hover:text-primary transition-colors">Privacy</a>
+                <a href="/about" class="hover:text-primary transition-colors">Terms</a>
+                <a href="/about" class="hover:text-primary transition-colors">System Status</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Core Scripts -->
+    <script>
+        // Lucide Icons
+        lucide.createIcons();
+
+        // Lenis Smooth Scroll
+        const lenis = new Lenis();
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // GSAP Initialization
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Loader disappearance
+        window.addEventListener('load', () => {
+            gsap.to("#loader", {
+                opacity: 0,
+                duration: 0.8,
+                onComplete: () => {
+                    document.getElementById('loader').style.display = 'none';
+                    // Animation after load
+                    AOS.refresh();
+                }
+            });
+        });
+    </script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            easing: 'ease-out-quad'
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

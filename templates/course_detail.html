@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.course_name }} | Chi tiết học phần{% endblock %}
+
+{% block content %}
+<!-- Back Nav -->
+<div class="mb-8" data-aos="fade-right">
+    <a href="/courses" class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-primary transition-colors group">
+        <i data-lucide="chevron-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i>
+        Quay lại Intelligence Network
+    </a>
+</div>
+
+<!-- Header -->
+<div class="mb-12" data-aos="fade-down">
+    <div class="inline-flex items-center gap-3 px-3 py-1 bg-white/5 rounded-full border border-white/10 mb-6">
+        <span class="text-[9px] font-black uppercase tracking-widest text-slate-400">{{ course.academic_year }} | Học kỳ {{ course.semester }}</span>
+    </div>
+    <h1 class="text-4xl md:text-6xl font-black tracking-tighter mb-4">{{ course.course_name }}</h1>
+    <p class="text-slate-500 font-medium max-w-2xl leading-relaxed">Phân tích hiệu suất lịch sử và bản đồ phân phối dân số cho học phần này.</p>
+</div>
+
+<!-- Top Stats Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+    <div class="card glass-morphism p-8 border-white/5 text-center" data-aos="fade-up" data-aos-delay="100">
+        <div class="p-3 bg-primary/10 rounded-2xl w-fit mx-auto mb-4 text-primary"><i data-lucide="activity" class="w-5 h-5"></i></div>
+        <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Average Index</p>
+        <h2 class="text-4xl font-black text-white tracking-tighter">{{ stats.avg_grade }}</h2>
+    </div>
+    <div class="card glass-morphism p-8 border-white/5 text-center" data-aos="fade-up" data-aos-delay="200">
+        <div class="p-3 bg-success/10 rounded-2xl w-fit mx-auto mb-4 text-success"><i data-lucide="check-circle" class="w-5 h-5"></i></div>
+        <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Success Rate</p>
+        <h2 class="text-4xl font-black text-white tracking-tighter">{{ stats.pass_rate }}%</h2>
+    </div>
+    <div class="card glass-morphism p-8 border-white/5 text-center" data-aos="fade-up" data-aos-delay="300">
+        <div class="p-3 bg-accent/10 rounded-2xl w-fit mx-auto mb-4 text-accent"><i data-lucide="users" class="w-5 h-5"></i></div>
+        <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Population</p>
+        <h2 class="text-4xl font-black text-white tracking-tighter">{{ stats.student_count }}</h2>
+    </div>
+    <div class="card glass-morphism p-8 border-white/5 text-center" data-aos="fade-up" data-aos-delay="400">
+        <div class="p-3 bg-warning/10 rounded-2xl w-fit mx-auto mb-4 text-warning"><i data-lucide="shield-alert" class="w-5 h-5"></i></div>
+        <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Correlation</p>
+        <h2 class="text-4xl font-black text-white tracking-tighter">{{ correlation.correlation }}</h2>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">
+    <!-- Evolution Map -->
+    <div class="card glass-morphism border-white/5 p-8" data-aos="fade-right">
+        <div class="flex justify-between items-center mb-10">
+            <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Subject Evolution Map (Multi-Year)</h5>
+            <div class="flex gap-2">
+                <span class="px-2 py-1 bg-primary/20 text-primary rounded text-[8px] font-black uppercase">Longitudinal Pulse</span>
+            </div>
+        </div>
+        <div class="h-[300px] w-full">
+            <canvas id="evolutionChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 📊 NEW: Matplotlib Distribution Chart -->
+    <div class="card glass-morphism border-white/5 p-8 flex flex-col" data-aos="fade-left">
+        <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-8">Cohort Grade Distribution (Matplotlib)</h5>
+        <div class="bg-white/5 rounded-3xl aspect-video flex items-center justify-center overflow-hidden border border-white/10 relative group">
+            {% if matplotlib_chart %}
+            <img src="/static/visualizations/{{ matplotlib_chart }}"
+                 class="w-full h-full object-contain p-2 transition-transform duration-700 group-hover:scale-105"
+                 alt="Grade Distribution">
+            {% else %}
+                <p class="text-[9px] font-black uppercase text-slate-600 tracking-widest">Awaiting Matplotlib Generation...</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
+    <!-- Synchronized Terms (History List) -->
+    <div class="lg:col-span-1 card glass-morphism border-white/5 overflow-hidden flex flex-col" data-aos="fade-right">
+        <div class="card-header border-white/5 p-8 flex items-center justify-between bg-white/[0.02]">
+            <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Other Cohorts / Years</h5>
+        </div>
+        <div class="card-body p-0 max-h-[500px] overflow-y-auto custom-scrollbar">
+            <div class="divide-y divide-white/5">
+                {% for h in history_stats %}
+                <a href="/course/{{ h.id }}" class="flex items-center justify-between p-6 hover:bg-white/[0.03] transition-all group {% if h.id == course.course_id %}bg-primary/5{% endif %}">
+                    <div>
+                        <h6 class="text-xs font-bold text-white mb-1 group-hover:text-primary transition-colors">
+                            {{ h.year }} | Kỳ {{ h.semester }}
+                        </h6>
+                        <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">{{ h.cohort }} Cohort</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-lg font-black text-white tracking-tighter">{{ h.avg }}</span>
+                        <p class="text-[8px] font-bold text-slate-600 uppercase">Avg Pulse</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Roster -->
+    <div class="lg:col-span-2 card glass-morphism border-white/5 overflow-hidden flex flex-col" data-aos="fade-left">
+        <div class="card-header border-white/5 p-8 flex items-center justify-between bg-white/[0.02]">
+            <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Synchronized Population Roster</h5>
+        </div>
+        <div class="card-body p-0 overflow-x-auto">
+            <table class="w-full text-left f-table">
+                <thead>
+                    <tr class="bg-white/5 text-[9px] font-black uppercase text-slate-500">
+                        <th class="px-8 py-5">Identity</th>
+                        <th class="px-8 py-5 text-center">CC (20%)</th>
+                        <th class="px-8 py-5 text-center">TBKT (30%)</th>
+                        <th class="px-8 py-5 text-center">Thi (50%)</th>
+                        <th class="px-8 py-5 text-right">Result</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    {% for g in grades %}
+                    <tr class="hover:bg-white/[0.01] transition-colors group">
+                        <td class="px-8 py-6">
+                            <a href="/student/{{ g.student_id }}" class="flex items-center gap-4">
+                                <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-black text-[10px] text-slate-500 group-hover:text-primary group-hover:bg-primary/10 transition-all">
+                                    {{ g.name[:2].upper() }}
+                                </div>
+                                <span class="font-bold text-xs text-white group-hover:text-primary transition-colors truncate max-w-[120px]">{{ g.name }}</span>
+                            </a>
+                        </td>
+                        <td class="px-8 py-6 text-center font-bold text-slate-400 text-xs">{{ g.attendance }}%</td>
+                        <td class="px-8 py-6 text-center font-bold text-slate-400 text-xs">{{ g.assignments }}</td>
+                        <td class="px-8 py-6 text-center font-bold text-slate-400 text-xs">{{ g.final }}</td>
+                        <td class="px-8 py-6 text-right">
+                            <span class="text-xl font-black text-white tracking-tighter">{{ g.final_grade }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const historyData = {{ history_json | safe }};
+
+    const ctx = document.getElementById('evolutionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: historyData.map(h => `${h.year.substring(2)} S${h.semester} (${h.cohort})`),
+            datasets: [{
+                label: 'Average Index',
+                data: historyData.map(h => h.avg),
+                borderColor: '#38bdf8',
+                backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                borderWidth: 4,
+                pointBackgroundColor: '#fff',
+                pointRadius: 6,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: {
+                y: { min: 0, max: 10, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { weight: 'bold' } } },
+                x: { ticks: { color: '#64748b', font: { weight: 'bold' } } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+</script>
+{% endblock %}

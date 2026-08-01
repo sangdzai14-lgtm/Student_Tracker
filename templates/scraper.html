@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Data Orchestrator | Academic AI 2026{% endblock %}
+
+{% block content %}
+<div class="mb-12" data-aos="fade-down">
+    <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20 mb-4">
+        <i data-lucide="database" class="w-3.5 h-3.5 text-primary"></i>
+        <span class="text-[10px] font-black uppercase tracking-widest text-primary">Local Data Ingestion</span>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-black tracking-tighter mb-4">
+        System <span class="animated-gradient-text">Orchestrator</span>
+    </h1>
+    <p class="text-slate-500 font-medium max-w-xl">Hệ thống tự động đào dữ liệu và nạp vào cơ sở dữ liệu nội bộ (SQLite).</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-20">
+    <!-- Configuration -->
+    <div class="lg:col-span-1 space-y-8">
+        <div class="card glass-morphism p-8 border-white/5" data-aos="fade-right">
+            <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-8">Node Parameters</h5>
+            <div class="space-y-6">
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-500">Source Link Gateway</label>
+                    <input type="text" id="url-input"
+                           value="https://truong-dai-hoc-bac-duy-thai-nguyen-diem.lovable.app/"
+                           class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-xs font-mono text-slate-400 focus:border-primary transition-all">
+                </div>
+                <button id="scrape-btn" class="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg hover:scale-[1.02] transition-all" onclick="startScraping()">
+                    INITIATE FULL SYNC
+                </button>
+            </div>
+        </div>
+
+        <div class="p-6 bg-white/[0.01] rounded-3xl border border-white/5 opacity-50">
+            <h6 class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Storage Info</h6>
+            <p class="text-[10px] text-slate-400 leading-relaxed">
+                <i data-lucide="info" class="w-3 h-3 inline mb-1 me-1"></i>
+                Dữ liệu được lưu trữ tại file <code>student_tracker.db</code> trong thư mục gốc của dự án.
+            </p>
+        </div>
+    </div>
+
+    <!-- Execution Visualizer -->
+    <div class="lg:col-span-2">
+        <div class="card glass-morphism border-white/5 h-full relative overflow-hidden" data-aos="fade-left">
+            <div class="card-header border-white/5 p-8 flex items-center justify-between">
+                <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Atomic Execution Flow</h5>
+                <span id="sync-timer" class="text-[10px] font-mono text-slate-600">LOCAL_MODE</span>
+            </div>
+            <div class="card-body p-8 space-y-10">
+                <div class="space-y-12" id="steps-container">
+                    <div class="flex items-center gap-6 opacity-30 transition-opacity" id="step-1">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-sm text-slate-500">1</div>
+                        <div class="flex-1"><h6 class="font-bold text-white text-xs tracking-widest uppercase">Deep Crawl Extraction</h6></div>
+                    </div>
+                    <div class="flex items-center gap-6 opacity-30 transition-opacity" id="step-2">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-sm text-slate-500">2</div>
+                        <div class="flex-1"><h6 class="font-bold text-white text-xs tracking-widest uppercase">Neural Normalization</h6></div>
+                    </div>
+                    <div class="flex items-center gap-6 opacity-30 transition-opacity" id="step-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-sm text-slate-500">3</div>
+                        <div class="flex-1"><h6 class="font-bold text-white text-xs tracking-widest uppercase">Local DB Ingestion</h6></div>
+                    </div>
+                </div>
+
+                <div id="progress-area" class="hidden pt-8 border-t border-white/5">
+                    <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-[1.5px]">
+                        <div id="setup-bar" class="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-700 shadow-[0_0_15px_rgba(56,189,248,0.3)]" style="width: 0%"></div>
+                    </div>
+                    <p id="progress-text" class="mt-4 text-[10px] font-black uppercase text-primary tracking-widest">Awaiting initialization...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="resultsSection" class="hidden" data-aos="zoom-in">
+    <div class="flex justify-center gap-4 mb-20">
+        <a href="/" class="px-12 py-4 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl hover:scale-105 transition-all">
+            VIEW DASHBOARD
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function startScraping() {
+        const bar = document.getElementById('setup-bar');
+        const txt = document.getElementById('progress-text');
+        const area = document.getElementById('progress-area');
+        const btn = document.getElementById('scrape-btn');
+
+        btn.disabled = true;
+        area.classList.remove('hidden');
+        gsap.to(bar, { width: '15%', duration: 1 });
+        updateStepUI(1);
+        txt.innerText = "Connecting to Local Node...";
+        
+        try {
+            const response = await fetch('/api/scrape', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ url: document.getElementById('url-input').value })
+            });
+
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                updateStepUI(2);
+                gsap.to(bar, { width: '60%', duration: 1.5 });
+                txt.innerText = "Analyzing Records...";
+
+                setTimeout(() => {
+                    updateStepUI(3);
+                    gsap.to(bar, { width: '100%', duration: 1 });
+                    txt.innerText = "Local Sync Complete.";
+                    document.getElementById('resultsSection').classList.remove('hidden');
+                    AOS.refresh();
+                }, 1000);
+            } else {
+                txt.innerText = "ERROR: " + data.message;
+                txt.style.color = "#ef4444";
+                btn.disabled = false;
+            }
+        } catch (error) {
+            txt.innerText = "NETWORK FAILURE";
+            btn.disabled = false;
+        }
+    }
+
+    function updateStepUI(idx) {
+        const step = document.getElementById('step-' + idx);
+        step.classList.remove('opacity-30');
+        step.classList.add('opacity-100');
+        step.querySelector('div').classList.add('bg-primary/20', 'border-primary', 'text-primary');
+    }
+</script>
+{% endblock %}

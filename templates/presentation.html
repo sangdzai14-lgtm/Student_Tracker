@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Intelligence Showroom | Academic AI 2026{% endblock %}
+
+{% block extra_css %}
+<style>
+    .showcase-bg {
+        background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+    }
+    .data-pill {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+    }
+    .neural-glow {
+        box-shadow: 0 0 50px -10px rgba(56, 189, 248, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex flex-col items-center justify-center showcase-bg rounded-[3rem] p-12 relative overflow-hidden border border-white/5" data-aos="zoom-in">
+    <!-- Animated background element -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] animate-pulse"></div>
+
+    <div class="relative z-10 text-center space-y-12 max-w-5xl w-full">
+        <div class="space-y-4">
+            <h5 class="text-[12px] font-black uppercase tracking-[0.5em] text-primary animate-pulse">Neural System Active</h5>
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white">INTELLIGENCE <span class="animated-gradient-text">SHOWROOM</span></h1>
+            <p class="text-slate-400 text-xl font-medium">Trình chiếu khả năng phân tích hành vi và dự báo học thuật thời gian thực.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Card 1: Data Ingestion -->
+            <div class="data-pill p-10 rounded-[2.5rem] space-y-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto text-primary">
+                    <i data-lucide="cloud-lightning" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white tracking-tight">LIVE SCRAPE</h3>
+                <p class="text-sm text-slate-500 leading-relaxed">Tự động bóc tách hàng ngàn bản ghi từ cổng thông tin ĐH Bắc Duy chỉ với 1 lần chạm.</p>
+            </div>
+
+            <!-- Card 2: Neural Processing -->
+            <div class="data-pill p-10 rounded-[2.5rem] space-y-6 neural-glow border-primary/20" data-aos="fade-up" data-aos-delay="400">
+                <div class="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mx-auto text-primary">
+                    <i data-lucide="brain-circuit" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white tracking-tight">RANDOM FOREST</h3>
+                <p class="text-sm text-slate-500 leading-relaxed">Mô hình AI đa tầng phân tích 94% độ chính xác dựa trên lịch sử học thuật 5 năm.</p>
+            </div>
+
+            <!-- Card 3: Automation -->
+            <div class="data-pill p-10 rounded-[2.5rem] space-y-6" data-aos="fade-up" data-aos-delay="600">
+                <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto text-primary">
+                    <i data-lucide="send" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white tracking-tight">AUTO-ALERT</h3>
+                <p class="text-sm text-slate-500 leading-relaxed">Giao thức gửi Email cảnh báo thông minh dựa trên phân loại rủi ro của Agents.</p>
+            </div>
+        </div>
+
+        <div class="pt-12">
+            <a href="/predictions" class="px-12 py-5 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl hover:scale-105 transition-transform inline-flex items-center gap-4">
+                BẮT ĐẦU TRÌNH DIỄN
+                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Extra Tech Info Footer -->
+<div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 opacity-30" data-aos="fade-up">
+    <div class="text-center py-4 border-x border-white/10"><p class="text-[10px] font-black uppercase text-slate-500">Node: Bac Duy Uni</p></div>
+    <div class="text-center py-4 border-x border-white/10"><p class="text-[10px] font-black uppercase text-slate-500">Engine: Python 3.12</p></div>
+    <div class="text-center py-4 border-x border-white/10"><p class="text-[10px] font-black uppercase text-slate-500">AI: Multi-Agent v7.0</p></div>
+    <div class="text-center py-4 border-x border-white/10"><p class="text-[10px] font-black uppercase text-slate-500">Status: Operational</p></div>
+</div>
+{% endblock %}

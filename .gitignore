@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env/
+
+# Databases
+*.db
+*.sqlite3
+
+# Scraped Data & Visualizations (Optional: keep if you want to push results)
+# scraped_data/
+# visualizations/
+
+# VS Code
+.vscode/
+.idea/
+
+# Models
+*.pkl

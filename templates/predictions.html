@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Neural Forecast | Academic AI 2026{% endblock %}
+
+{% block content %}
+<div class="mb-12" data-aos="fade-down">
+    <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20 mb-4">
+        <i data-lucide="target" class="w-3.5 h-3.5 text-primary"></i>
+        <span class="text-[10px] font-black uppercase tracking-widest text-primary">Neural Inference Engine</span>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-black tracking-tighter mb-4">
+        Predictive <span class="animated-gradient-text">Analysis</span>
+    </h1>
+    <p class="text-slate-500 font-medium max-w-xl">Dự báo kết quả và lọc dân số tương đồng dựa trên mô hình Rừng Ngẫu Nhiên.</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+    <!-- Manual Input -->
+    <div class="card glass-morphism p-8 border-white/5" data-aos="fade-right">
+        <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-10">Numerical Pulse Parameters</h5>
+
+        <div class="space-y-10">
+            <div class="space-y-5">
+                <div class="flex justify-between items-center">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-500">Midterm Score (Max 10)</label>
+                    <span id="midterm-val" class="px-3 py-1 bg-white/5 rounded-lg text-xs font-black text-white">7.0</span>
+                </div>
+                <input type="range" id="midterm-in" min="0" max="10" step="0.1" value="7.0" class="f-range w-full" oninput="updatePredictUI()">
+            </div>
+
+            <div class="space-y-5">
+                <div class="flex justify-between items-center">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-500">Attendance Log (%)</label>
+                    <span id="attendance-val" class="px-3 py-1 bg-white/5 rounded-lg text-xs font-black text-white">100%</span>
+                </div>
+                <input type="range" id="attendance-in" min="0" max="100" step="1" value="100" class="f-range w-full" oninput="updatePredictUI()">
+            </div>
+
+            <div class="space-y-5">
+                <div class="flex justify-between items-center">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-500">Assignment Completion</label>
+                    <span id="assignment-val" class="px-3 py-1 bg-white/5 rounded-lg text-xs font-black text-white">8.0</span>
+                </div>
+                <input type="range" id="assignment-in" min="0" max="10" step="0.1" value="8.0" class="f-range w-full" oninput="updatePredictUI()">
+            </div>
+
+            <button class="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-[0_0_40px_rgba(56,189,248,0.3)] hover:scale-[1.02] active:scale-95 transition-all" onclick="computeForecast()">
+                TÍNH TOÁN DỰ BÁO AI
+            </button>
+        </div>
+    </div>
+
+    <!-- Prediction Output -->
+    <div class="card glass-morphism border-white/5 relative overflow-hidden" data-aos="fade-left">
+        <div id="output-overlay" class="absolute inset-0 z-20 bg-background/80 backdrop-blur-md flex items-center justify-center transition-all opacity-100">
+            <div class="text-center">
+                <i data-lucide="brain-circuit" class="w-12 h-12 text-slate-700 mx-auto mb-4"></i>
+                <p class="text-[10px] font-black text-slate-600 uppercase tracking-widest">Awaiting Numerical Input</p>
+            </div>
+        </div>
+
+        <div class="card-body p-10 flex flex-col h-full">
+            <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-12">Neural Synthesis Result</h5>
+
+            <div class="flex-1 flex flex-col items-center justify-center text-center py-10">
+                <div class="relative mb-8">
+                    <div id="grade-pulse" class="w-32 h-32 rounded-full border-2 border-primary/20 flex items-center justify-center">
+                        <span id="predicted-letter" class="text-6xl font-black text-white tracking-tighter">?</span>
+                    </div>
+                    <div class="absolute -top-2 -right-2 px-3 py-1 bg-primary text-primary-foreground rounded-lg text-[9px] font-black uppercase tracking-widest">Predicted</div>
+                </div>
+
+                <h3 id="predicted-grade" class="text-2xl font-black mb-2 text-white">---</h3>
+                <p id="forecast-reasoning" class="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">Neural model awaiting parameters.</p>
+            </div>
+
+            <div class="pt-8 border-t border-white/5">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-[9px] font-black text-slate-600 uppercase tracking-widest">RF Confidence Threshold</span>
+                    <span id="confidence-val" class="text-[10px] font-mono text-primary">0%</span>
+                </div>
+                <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div id="gen-bar" class="h-full bg-primary transition-all duration-1000" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Population Scan -->
+<div class="mb-12">
+    <div class="flex flex-col items-center mb-10 text-center">
+        <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">Nhóm sinh viên có đặc điểm tương đồng</h5>
+        <p class="text-xs text-slate-600 max-w-md">Danh sách 6 sinh viên có các chỉ số (Chuyên cần, Bài tập) gần nhất với cấu hình trượt ở trên.</p>
+    </div>
+
+    <div id="risk-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[200px]">
+        <!-- Dynamic risk students here -->
+    </div>
+</div>
+
+<!-- Scale Mapping -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 pb-20">
+    <div class="p-6 glass-morphism rounded-2xl border-white/5 text-center">
+        <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Grade A</span>
+        <h6 class="font-black text-white">8.5 - 10.0</h6>
+        <p class="text-[9px] text-slate-600 uppercase mt-1">Excellent</p>
+    </div>
+    <div class="p-6 glass-morphism rounded-2xl border-white/5 text-center">
+        <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Grade B</span>
+        <h6 class="font-black text-white">7.0 - 8.4</h6>
+        <p class="text-[9px] text-slate-600 uppercase mt-1">Good</p>
+    </div>
+    <div class="p-6 glass-morphism rounded-2xl border-white/5 text-center">
+        <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Grade C</span>
+        <h6 class="font-black text-white">5.5 - 6.9</h6>
+        <p class="text-[9px] text-slate-600 uppercase mt-1">Satisfactory</p>
+    </div>
+    <div class="p-6 glass-morphism rounded-2xl border-white/5 text-center">
+        <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Grade D/F</span>
+        <h6 class="font-black text-white">< 5.5</h6>
+        <p class="text-[9px] text-slate-600 uppercase mt-1">Warning</p>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let allStudents = [];
+
+    function updatePredictUI() {
+        document.getElementById('midterm-val').innerText = document.getElementById('midterm-in').value;
+        document.getElementById('attendance-val').innerText = document.getElementById('attendance-in').value + '%';
+        document.getElementById('assignment-val').innerText = document.getElementById('assignment-in').value;
+
+        // 🔑 REAL-TIME FILTERING
+        filterStudents();
+    }
+
+    async function computeForecast() {
+        const overlay = document.getElementById('output-overlay');
+        overlay.style.opacity = '1';
+        overlay.querySelector('p').innerText = "Running Neural Pulse...";
+
+        const payload = {
+            midterm: document.getElementById('midterm-in').value,
+            attendance: document.getElementById('attendance-in').value,
+            assignments: document.getElementById('assignment-in').value
+        };
+
+        try {
+            const res = await fetch('/api/predict', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+                overlay.style.pointerEvents = 'none';
+
+                document.getElementById('predicted-letter').innerText = data.predicted_letter;
+                document.getElementById('predicted-grade').innerText = "Điểm: " + data.predicted_grade;
+                document.getElementById('forecast-reasoning').innerText = data.predictor_logic.analysis;
+                document.getElementById('confidence-val').innerText = (data.confidence * 100) + "%";
+                document.getElementById('gen-bar').style.width = (data.confidence * 100) + "%";
+            }, 500);
+
+        } catch (e) {
+            overlay.querySelector('p').innerText = "AI ENGINE SYNC ERROR";
+        }
+    }
+
+    async function fetchDatabasePopulation() {
+        try {
+            const res = await fetch('/api/at-risk-report');
+            allStudents = await res.json();
+            filterStudents();
+        } catch (e) {
+            console.error("Failed to sync population nodes:", e);
+        }
+    }
+
+    function filterStudents() {
+        const att = parseFloat(document.getElementById('attendance-in').value);
+        const ass = parseFloat(document.getElementById('assignment-in').value);
+        const container = document.getElementById('risk-list');
+
+        if (!allStudents || allStudents.length === 0) return;
+
+        // 🔑 CLOSENESS SORTING: Calculate Euclidean distance based on inputs
+        const sorted = [...allStudents].sort((a, b) => {
+            const distA = Math.sqrt(Math.pow(a.attendance - att, 2) + Math.pow((a.assignments || 8) - ass, 2));
+            const distB = Math.sqrt(Math.pow(b.attendance - att, 2) + Math.pow((b.assignments || 8) - ass, 2));
+            return distA - distB;
+        });
+
+        const topMatches = sorted.slice(0, 6);
+
+        container.innerHTML = topMatches.map(s => `
+            <div class="card glass-morphism p-6 border-white/5 hover:border-primary/40 transition-all group">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-black text-[10px]">
+                        ${s.name.substring(0,2).toUpperCase()}
+                    </div>
+                    <span class="px-2 py-1 bg-white/5 text-primary rounded text-[8px] font-black uppercase tracking-widest">Matched</span>
+                </div>
+                <h6 class="font-bold text-sm text-white group-hover:text-primary transition-colors">${s.name}</h6>
+                <p class="text-[9px] text-slate-500 font-mono uppercase mb-4">${s.student_id}</p>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[8px] font-black text-slate-600 uppercase">Chuyên cần</span>
+                        <span class="text-[8px] font-black text-slate-400">${Math.round(s.attendance)}%</span>
+                    </div>
+                    <div class="h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div class="h-full bg-primary" style="width: ${s.attendance}%"></div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        lucide.createIcons();
+    }
+
+    window.onload = () => {
+        updatePredictUI();
+        fetchDatabasePopulation();
+    }
+</script>
+{% endblock %}

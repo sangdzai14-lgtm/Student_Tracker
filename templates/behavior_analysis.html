@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Behavior AI | Neural Pattern Detection 2026{% endblock %}
+
+{% block content %}
+<div class="mb-12" data-aos="fade-down">
+    <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20 mb-4">
+        <i data-lucide="brain-circuit" class="w-3.5 h-3.5 text-primary"></i>
+        <span class="text-[10px] font-black uppercase tracking-widest text-primary">Neural Behavioral Analysis</span>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-black tracking-tighter mb-4">
+        Cognitive <span class="animated-gradient-text">Profiling</span>
+    </h1>
+    <p class="text-slate-500 font-medium max-w-xl">Hệ thống Multi-Agent tự động phân loại sinh viên dựa trên nghịch lý giữa Nỗ lực (Chuyên cần) và Kết quả (Điểm số).</p>
+</div>
+
+<!-- Top Section: Radar + Stats -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+    <div class="lg:col-span-2 card glass-morphism border-white/5 p-8" data-aos="fade-right">
+        <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-8 text-center">Global Behavioral Signature</h5>
+        <div class="h-[400px] w-full flex items-center justify-center">
+            <canvas id="behaviorRadar"></canvas>
+        </div>
+    </div>
+
+    <div class="card glass-morphism border-white/5 p-8" data-aos="fade-left">
+        <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-8">Population Distribution</h5>
+        <div class="h-[250px] w-full flex items-center justify-center mb-8">
+            <canvas id="behaviorDonut"></canvas>
+        </div>
+        <div class="space-y-4">
+            <div class="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Steady Growth</span>
+                <span class="text-xs font-black text-white">68%</span>
+            </div>
+            <div class="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                <span class="text-[10px] font-bold text-amber-400 uppercase tracking-widest">Efficiency Gap</span>
+                <span class="text-xs font-black text-white">22%</span>
+            </div>
+            <div class="flex justify-between items-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                <span class="text-[10px] font-bold text-red-400 uppercase tracking-widest">Disengagement</span>
+                <span class="text-xs font-black text-white">10%</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mb-10" data-aos="fade-up">
+    <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Select category to drill-down</p>
+</div>
+
+<!-- Interaction Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" id="categoryCards">
+    <!-- Phantom -->
+    <button onclick="drillDown('phantom')" class="card glass-morphism p-8 border-white/5 hover:border-sky-500/50 transition-all text-left group">
+        <span class="text-[9px] font-black text-sky-400 uppercase tracking-widest mb-4 block">Phantom Excellence</span>
+        <h3 class="text-sm font-black text-white mb-2">High Perf. / Low Presence</h3>
+        <p class="text-[10px] text-slate-500 leading-relaxed">Sinh viên tài năng nhưng vắng mặt nhiều. Nguy cơ thiếu hụt kiến thức nền tảng.</p>
+    </button>
+    <!-- Cognitive -->
+    <button onclick="drillDown('cognitive')" class="card glass-morphism p-8 border-white/5 hover:border-amber-500/50 transition-all text-left group">
+        <span class="text-[9px] font-black text-amber-400 uppercase tracking-widest mb-4 block">Cognitive Barrier</span>
+        <h3 class="text-sm font-black text-white mb-2">High Effort / Low Result</h3>
+        <p class="text-[10px] text-slate-500 leading-relaxed">Sinh viên chăm chỉ nhưng kết quả thấp. Cần xem lại phương pháp học tập.</p>
+    </button>
+    <!-- Engagement -->
+    <button onclick="drillDown('engagement')" class="card glass-morphism p-8 border-white/5 hover:border-red-500/50 transition-all text-left group">
+        <span class="text-[9px] font-black text-red-500 uppercase tracking-widest mb-4 block">Engagement Deficit</span>
+        <h3 class="text-sm font-black text-white mb-2">Assignment Cycle Drop</h3>
+        <p class="text-[10px] text-slate-500 leading-relaxed">Bỏ bê bài tập và đồ án. Nguy cơ trượt môn do thiếu điểm thành phần.</p>
+    </button>
+    <!-- Optimal -->
+    <button onclick="drillDown('optimal')" class="card glass-morphism p-8 border-white/5 hover:border-emerald-500/50 transition-all text-left group">
+        <span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-4 block">Optimal State</span>
+        <h3 class="text-sm font-black text-white mb-2">Correlated Success</h3>
+        <p class="text-[10px] text-slate-500 leading-relaxed">Phong độ ổn định, đi học đầy đủ và điểm số cao. Hình mẫu lý tưởng của AI.</p>
+    </button>
+</div>
+
+<!-- Drill-down Results -->
+<div id="resultsArea" class="hidden mb-20" data-aos="zoom-in">
+    <div class="card glass-morphism border-white/5 overflow-hidden">
+        <div class="card-header border-white/5 p-8 flex items-center justify-between bg-white/[0.02]">
+            <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400" id="drilldownTitle">Identified Entities</h5>
+            <button onclick="hideResults()" class="p-2 hover:bg-white/5 rounded-lg"><i data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
+        </div>
+        <div class="card-body p-0 max-h-[400px] overflow-y-auto custom-scrollbar">
+            <div id="drilldownList" class="divide-y divide-white/5"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let categoryData = {};
+
+    // Initialize Radar Chart
+    const radarCtx = document.getElementById('behaviorRadar').getContext('2d');
+    const behaviorRadar = new Chart(radarCtx, {
+        type: 'radar',
+        data: {
+            labels: ['Exam Mastery', 'Session Attendance', 'Task Completion', 'Concept Recall', 'Self-Study Index', 'Collaboration'],
+            datasets: [{
+                label: 'Global Average',
+                data: [7.5, 8.8, 6.2, 7.0, 5.8, 8.0],
+                backgroundColor: 'rgba(56, 189, 248, 0.2)',
+                borderColor: '#38bdf8',
+                borderWidth: 2,
+                pointBackgroundColor: '#38bdf8'
+            }, {
+                label: 'At-Risk Average',
+                data: [4.2, 6.5, 3.8, 4.0, 3.5, 4.5],
+                backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                borderColor: '#ef4444',
+                borderWidth: 2,
+                pointBackgroundColor: '#ef4444'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    angleLines: { color: 'rgba(255,255,255,0.05)' },
+                    grid: { color: 'rgba(255,255,255,0.1)' },
+                    pointLabels: { color: '#64748b', font: { size: 10, weight: 'bold' } },
+                    ticks: { display: false },
+                    suggestedMin: 0, suggestedMax: 10
+                }
+            },
+            plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10, weight: 'bold' } } } }
+        }
+    });
+
+    // Initialize Donut Chart
+    const donutCtx = document.getElementById('behaviorDonut').getContext('2d');
+    new Chart(donutCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Stable', 'Risk', 'Borderline'],
+            datasets: [{
+                data: [68, 10, 22],
+                backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '80%',
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    async function fetchBehavioralData() {
+        try {
+            const response = await fetch('/api/intelligence/behavioral');
+            categoryData = await response.json();
+            console.log("Behavioral Data Synced:", categoryData);
+        } catch (error) {
+            console.error("Failed to sync behavioral nodes:", error);
+        }
+    }
+
+    function drillDown(cat) {
+        const area = document.getElementById('resultsArea');
+        const list = document.getElementById('drilldownList');
+        const title = document.getElementById('drilldownTitle');
+        const students = categoryData[cat] || [];
+
+        area.classList.remove('hidden');
+        title.innerText = `IDENTIFIED ENTITIES: ${cat.toUpperCase()}`;
+
+        if (students.length === 0) {
+            list.innerHTML = '<div class="p-20 text-center text-slate-600 uppercase text-[10px] font-black">No entities matching this behavioral signature.</div>';
+        } else {
+            list.innerHTML = students.map(s => `
+                <div class="flex items-center justify-between p-6 hover:bg-white/[0.02] transition-all">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-xs text-white">
+                            ${s.name.substring(0,2).toUpperCase()}
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-bold text-sm text-white">${s.name}</span>
+                            <span class="text-[9px] text-slate-600 font-mono">${s.student_id}</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-lg font-black text-white tracking-tighter">${s.gpa.toFixed(2)}</span>
+                        <p class="text-[8px] font-bold text-slate-600 uppercase">Current GPA</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        gsap.from("#resultsArea", { y: 20, opacity: 0, duration: 0.5, ease: "power2.out" });
+        lucide.createIcons();
+    }
+
+    function hideResults() {
+        document.getElementById('resultsArea').classList.add('hidden');
+    }
+
+    window.onload = fetchBehavioralData;
+</script>
+{% endblock %}

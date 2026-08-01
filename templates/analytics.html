@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Hệ thống Phân tích | Academic AI 2026{% endblock %}
+
+{% block content %}
+<div class="mb-12" data-aos="fade-down">
+    <div class="inline-flex items-center gap-2 px-3 py-1 bg-danger/10 rounded-full border border-danger/20 mb-4">
+        <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-danger animate-pulse"></i>
+        <span class="text-[10px] font-black uppercase tracking-widest text-danger">Autonomous Warning Center</span>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-black tracking-tighter mb-4">
+        Academic <span class="text-danger">Risk Matrix</span>
+    </h1>
+    <p class="text-slate-500 font-medium max-w-xl">Phân tích rủi ro đa chiều và trực quan hóa dân số sinh viên (Matplotlib AI).</p>
+</div>
+
+<!-- Risk List -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
+    <div class="lg:col-span-1">
+        <div class="card glass-morphism border-white/5 overflow-hidden h-full" data-aos="fade-right">
+            <div class="card-header border-white/5 p-8 flex items-center justify-between bg-white/[0.02]">
+                <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Risk Identification Queue</h5>
+                <span class="px-2 py-1 bg-red-500/20 text-red-500 rounded text-[8px] font-black uppercase tracking-widest">{{ at_risk|length }} Profiles</span>
+            </div>
+            <div class="card-body p-0 max-h-[700px] overflow-y-auto custom-scrollbar">
+                {% if at_risk %}
+                    <table class="w-full text-left">
+                        <tbody class="divide-y divide-white/5">
+                            {% for student in at_risk %}
+                            <tr class="hover:bg-white/[0.01] transition-colors group">
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-black text-[10px] text-slate-500">
+                                            {{ student.name[:2].upper() }}
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <span class="font-bold text-xs text-white">{{ student.name }}</span>
+                                            <span class="text-[8px] text-slate-600 font-mono">{{ student.student_id }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-5">
+                                    <div class="flex flex-wrap gap-1">
+                                        {% for w in student.warnings %}
+                                        <span class="px-2 py-0.5 rounded-[4px] text-[7px] font-black uppercase border
+                                            {% if w.level == 'Critical' %}bg-red-500/10 border-red-500/30 text-red-500
+                                            {% elif w.level == 'High' %}bg-amber-500/10 border-amber-500/30 text-amber-500
+                                            {% else %}bg-blue-500/10 border-blue-500/30 text-blue-500{% endif %}">
+                                            {{ w.type }}
+                                        </span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="p-24 text-center opacity-30">
+                        <i data-lucide="shield-check" class="w-12 h-12 mx-auto mb-6 text-success"></i>
+                        <h4 class="text-sm font-bold text-white">Hệ thống ổn định</h4>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 📊 DUAL CHARTS SECTION -->
+    <div class="lg:col-span-2 space-y-8">
+        <!-- Control Bar -->
+        <div class="card glass-morphism p-6 border-white/5 flex items-center justify-between" data-aos="fade-down">
+            <div class="flex items-center gap-4">
+                <div class="p-3 bg-primary/10 rounded-xl"><i data-lucide="bar-chart-3" class="w-5 h-5 text-primary"></i></div>
+                <div>
+                    <h6 class="text-xs font-black text-white uppercase tracking-widest">Matplotlib Core v10.0</h6>
+                    <p class="text-[9px] text-slate-500 uppercase tracking-widest">Dual Engine Visualization</p>
+                </div>
+            </div>
+            <button id="gen-btn" onclick="startGeneration()" class="px-8 py-3 bg-primary text-primary-foreground rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
+                <i data-lucide="cpu" class="w-4 h-4"></i>
+                Khởi tạo Biểu đồ
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Chart 1: Distribution -->
+            <div class="card glass-morphism border-white/5 p-8 flex flex-col" data-aos="fade-up" data-aos-delay="100">
+                <h5 class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6">Histogram: GPA Distribution</h5>
+                <div class="bg-white/5 rounded-3xl aspect-square flex items-center justify-center overflow-hidden border border-white/10 relative group">
+                    <img id="chart-dist" src="/static/visualizations/gpa_distribution.png?v={{ range(1, 9999)|random }}"
+                         class="w-full h-full object-contain p-4 transition-transform duration-700 group-hover:scale-110"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <div class="hidden absolute inset-0 flex-col items-center justify-center text-center p-8 bg-background/40 backdrop-blur-md">
+                        <i data-lucide="image-off" class="w-10 h-10 text-slate-700 mb-4"></i>
+                        <p class="text-[9px] font-black uppercase text-slate-600 tracking-widest">Awaiting Gen...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 2: Risk Ratio (PIE) -->
+            <div class="card glass-morphism border-white/5 p-8 flex flex-col" data-aos="fade-up" data-aos-delay="200">
+                <h5 class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 mb-6">Pie Chart: Risk Proportion</h5>
+                <div class="bg-white/5 rounded-3xl aspect-square flex items-center justify-center overflow-hidden border border-white/10 relative group">
+                    <img id="chart-pie" src="/static/visualizations/risk_ratio.png?v={{ range(1, 9999)|random }}"
+                         class="w-full h-full object-contain p-4 transition-transform duration-700 group-hover:scale-110"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <div class="hidden absolute inset-0 flex-col items-center justify-center text-center p-8 bg-background/40 backdrop-blur-md">
+                        <i data-lucide="image-off" class="w-10 h-10 text-slate-700 mb-4"></i>
+                        <p class="text-[9px] font-black uppercase text-slate-600 tracking-widest">Awaiting Gen...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generation Progress (Shared) -->
+        <div id="gen-overlay" class="hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-xl flex items-center justify-center">
+            <div class="text-center space-y-8 max-w-sm w-full px-8">
+                <div class="relative inline-block">
+                    <div class="w-24 h-24 rounded-full border-2 border-primary/20 border-t-primary animate-spin"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <i data-lucide="cpu" class="w-8 h-8 text-primary"></i>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-black text-white uppercase tracking-tighter mb-2" id="status-msg">Neural Synthesis</h3>
+                    <p class="text-xs text-slate-500 font-medium leading-relaxed">Hệ thống đang nạp dữ liệu và vẽ lại toàn bộ các biểu đồ phân tích...</p>
+                </div>
+                <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div id="gen-bar" class="h-full bg-primary transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    async function startGeneration() {
+        const overlay = document.getElementById('gen-overlay');
+        const bar = document.getElementById('gen-bar');
+        const msg = document.getElementById('status-msg');
+
+        overlay.classList.remove('hidden');
+        gsap.to(bar, { width: '40%', duration: 1.5 });
+        msg.innerText = "EXTRACTING DATA...";
+
+        try {
+            const response = await fetch('/api/scrape', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({}) });
+
+            gsap.to(bar, { width: '85%', duration: 2 });
+            msg.innerText = "RENDERING DUAL CHARTS...";
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                gsap.to(bar, { width: '100%', duration: 0.5 });
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                alert("LỖI: " + data.message);
+                overlay.classList.add('hidden');
+            }
+        } catch (error) {
+            alert("LỖI KẾT NỐI SERVER");
+            overlay.classList.add('hidden');
+        }
+    }
+
+    function refreshAllCharts() {
+        const t = new Date().getTime();
+        document.getElementById('chart-dist').src = '/static/visualizations/gpa_distribution.png?v=' + t;
+        document.getElementById('chart-pie').src = '/static/visualizations/risk_ratio.png?v=' + t;
+    }
+</script>
+{% endblock %}

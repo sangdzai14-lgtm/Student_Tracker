@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}{{ student.name }} | Thông tin chi tiết{% endblock %}
+
+{% block content %}
+<!-- Back Navigation -->
+<div class="mb-8" data-aos="fade-right">
+    <a href="/students" class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-primary transition-colors group">
+        <i data-lucide="chevron-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i>
+        Quay lại Danh sách Sinh viên
+    </a>
+</div>
+
+<!-- Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12" data-aos="fade-down">
+    <div class="flex items-center gap-6">
+        <div class="w-20 h-20 md:w-32 md:h-32 rounded-[2.5rem] bg-gradient-to-tr from-primary/20 to-accent/20 border border-white/10 flex items-center justify-center text-4xl md:text-5xl font-black text-white shadow-2xl">
+            {{ student.name[:2].upper() }}
+        </div>
+        <div class="space-y-2">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20">
+                <span class="w-2 h-2 bg-success rounded-full animate-pulse"></span>
+                <span class="text-[10px] font-black uppercase tracking-widest text-primary">Hồ sơ đã đồng bộ</span>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-black tracking-tighter">{{ student.name }}</h1>
+            <p class="text-xs font-mono text-slate-500 tracking-[0.3em] uppercase">{{ student.student_id }}</p>
+        </div>
+    </div>
+
+    <div class="px-8 py-6 glass-morphism rounded-3xl border-white/5 text-center min-w-[160px]">
+        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Điểm trung bình (GPA)</p>
+        <h2 class="text-5xl font-black text-white tracking-tighter leading-none">{{ "%.2f"|format(stats.gpa) }}</h2>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+    <!-- Bio Card -->
+    <div class="card glass-morphism p-8 border-white/5 space-y-8" data-aos="fade-right">
+        <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Thông tin cá nhân</h5>
+
+        <div class="space-y-6">
+            <div class="flex items-center gap-4">
+                <div class="p-2 bg-white/5 rounded-lg"><i data-lucide="mail" class="w-4 h-4 text-slate-400"></i></div>
+                <div class="flex flex-col">
+                    <span class="text-[9px] font-black text-slate-500 uppercase">Địa chỉ Email</span>
+                    <span class="text-sm font-bold text-white truncate max-w-[200px]">{{ student.email }}</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="p-2 bg-white/5 rounded-lg"><i data-lucide="compass" class="w-4 h-4 text-slate-400"></i></div>
+                <div class="flex flex-col">
+                    <span class="text-[9px] font-black text-slate-500 uppercase">Khoa đào tạo</span>
+                    <span class="text-sm font-bold text-white">{{ student.major }}</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="p-2 bg-white/5 rounded-lg"><i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i></div>
+                <div class="flex flex-col">
+                    <span class="text-[9px] font-black text-slate-500 uppercase">Ngày nhập hệ thống</span>
+                    <span class="text-sm font-bold text-white">{{ student.created_at[:10] }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Academic Index Card -->
+    <div class="lg:col-span-2 card glass-morphism border-white/5 p-8" data-aos="fade-left">
+        <div class="flex justify-between items-center mb-8">
+            <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Tiến trình học tập</h5>
+            <div class="flex gap-2">
+                <span class="px-2 py-1 bg-primary/10 rounded text-[8px] font-black text-primary uppercase">Biểu đồ xu hướng</span>
+            </div>
+        </div>
+
+        <div class="h-[250px] w-full">
+            <canvas id="progressionChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Records (Grouped by Year/Semester) -->
+<h5 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8 px-2" data-aos="fade-up">Lịch sử bảng điểm chi tiết</h5>
+
+{% set current_term = [none] %}
+{% for grade in grades %}
+    {% set term_key = "Năm học " ~ grade.academic_year ~ " | Học kỳ " ~ grade.semester %}
+
+    {% if term_key != current_term[0] %}
+        {% if current_term[0] is not none %}
+            </tbody></table></div></div></div>
+        {% endif %}
+
+        <div class="mb-10" data-aos="fade-up">
+            <div class="flex items-center gap-3 mb-4 px-2">
+                <div class="w-1.5 h-6 bg-primary rounded-full"></div>
+                <h4 class="text-sm font-black text-white uppercase tracking-widest">{{ term_key }}</h4>
+            </div>
+
+            <div class="card glass-morphism border-white/5 overflow-hidden">
+                <div class="card-body p-0">
+                    <table class="w-full text-left f-table">
+                        <thead>
+                            <tr class="bg-white/5">
+                                <th class="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500">Môn học</th>
+                                <th class="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500 text-center">C.Cần (20%)</th>
+                                <th class="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500 text-center">K.Tra (30%)</th>
+                                <th class="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500 text-center">Thi (50%)</th>
+                                <th class="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-slate-500 text-right">Tổng kết</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+        {% set _ = current_term.pop() %}
+        {% set _ = current_term.append(term_key) %}
+    {% endif %}
+
+    <tr class="hover:bg-white/[0.02] transition-colors group">
+        <td class="px-6 py-5">
+            <a href="/course/{{ grade.course_id }}" class="flex flex-col">
+                <span class="font-bold text-sm text-white group-hover:text-primary transition-colors">{{ grade.course_name.split(' - ')[0] }}</span>
+                <span class="text-[9px] font-mono text-slate-600 tracking-tighter uppercase">{{ grade.course_id }}</span>
+            </a>
+        </td>
+        <td class="px-6 py-5 text-center font-bold text-slate-400 text-xs">{{ "%.1f"|format(grade.attendance/10) if grade.attendance else "0.0" }}</td>
+        <td class="px-6 py-5 text-center font-bold text-slate-400 text-xs">{{ "%.1f"|format(grade.assignments) }}</td>
+        <td class="px-6 py-5 text-center font-bold text-slate-400 text-xs">{{ "%.1f"|format(grade.midterm) }}</td>
+        <td class="px-6 py-5 text-right">
+            <div class="inline-flex items-center gap-4">
+                <span class="text-xl font-black text-white tracking-tighter">{{ "%.1f"|format(grade.final_grade) }}</span>
+                <div class="w-8 h-8 rounded-lg border
+                    {% if grade.letter_grade == 'A' %}border-emerald-400 text-emerald-400 bg-emerald-400/10
+                    {% elif grade.letter_grade == 'B' %}border-sky-400 text-sky-400 bg-sky-400/10
+                    {% elif grade.letter_grade == 'C' %}border-amber-400 text-amber-400 bg-amber-400/10
+                    {% elif grade.letter_grade == 'D' %}border-orange-500 text-orange-500 bg-orange-500/10
+                    {% else %}border-red-500 text-red-500 bg-red-500/10{% endif %}
+                    flex items-center justify-center text-[10px] font-black group-hover:scale-110 transition-all">
+                    {{ grade.letter_grade }}
+                </div>
+            </div>
+        </td>
+    </tr>
+
+    {% if loop.last %}
+        </tbody></table></div></div></div>
+    {% endif %}
+{% endfor %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const rawGrades = {{ grades | tojson | safe }};
+    const chartData = [...rawGrades].reverse();
+
+    const ctx = document.getElementById('progressionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.map(g => `${g.course_name.split(' - ')[0]} (${g.academic_year.split('/')[0]})`),
+            datasets: [{
+                label: 'Điểm tổng kết',
+                data: chartData.map(g => g.final_grade),
+                borderColor: '#38bdf8',
+                backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                borderWidth: 3,
+                pointBackgroundColor: '#fff',
+                pointRadius: 4,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { min: 0, max: 10, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { weight: 'bold' } } },
+                x: { display: false }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleFont: { size: 10 },
+                    bodyFont: { size: 13, weight: 'bold' },
+                    padding: 12,
+                    cornerRadius: 10,
+                    displayColors: false
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

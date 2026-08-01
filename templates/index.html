@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Academic Intelligence 2026{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative mb-20">
+    <div class="absolute -top-24 -left-24 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none"></div>
+
+    <div class="card border-primary/20 glass-morphism overflow-hidden relative" data-aos="fade-up">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none border border-white/5 rounded-[inherit]"></div>
+        <div class="card-body p-8 md:p-12 text-center relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10 mb-6" data-aos="fade-down" data-aos-delay="200">
+                <span class="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Hệ thống Local v8.5.1</span>
+            </div>
+
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-6" data-aos="fade-up" data-aos-delay="300">
+                <span class="animated-gradient-text">Bac Duy AI Orchestrator</span>
+            </h1>
+
+            <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed font-medium" data-aos="fade-up" data-aos-delay="400">
+                Autonomous academic intelligence pipeline. Extracting and analyzing
+                live performance metrics across all University faculties.
+            </p>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4" data-aos="fade-up" data-aos-delay="500">
+                <button class="group relative px-8 py-4 bg-primary text-primary-foreground rounded-2xl font-bold shadow-[0_0_40px_-5px_rgba(56,189,248,0.5)] hover:shadow-[0_0_60px_-5px_rgba(56,189,248,0.6)] transition-all active:scale-95 overflow-hidden" onclick="startGlobalScrape()">
+                    <span class="relative z-10 flex items-center gap-2">
+                        <i data-lucide="zap" class="w-5 h-5 fill-current"></i>
+                        RUN SYSTEM SETUP
+                    </span>
+                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform"></div>
+                </button>
+                <a href="/analysis" class="px-8 py-4 glass-morphism rounded-2xl font-bold hover:bg-white/5 transition-all flex items-center justify-center gap-2 border border-white/10">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5 text-primary"></i>
+                    LIVE ANALYTICS
+                </a>
+            </div>
+
+            <!-- Setup Progress -->
+            <div id="setup-progress" class="max-w-xl mx-auto mt-12 space-y-4" style="display: none;">
+                <div class="flex justify-between text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase">
+                    <span id="setup-status">INITIATING LOCAL CORE...</span>
+                    <span id="setup-percent">0%</span>
+                </div>
+                <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5 p-[2px]">
+                    <div id="setup-bar" class="h-full bg-gradient-to-r from-primary via-accent to-primary rounded-full transition-all duration-700 shadow-[0_0_20px_rgba(56,189,248,0.4)]" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if not has_data %}
+<!-- Empty State -->
+<div class="py-24 text-center" data-aos="zoom-in">
+    <div class="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center mx-auto mb-8 border border-white/10 rotate-6 shadow-inner">
+        <i data-lucide="database-zap" class="w-8 h-8 text-slate-400"></i>
+    </div>
+    <h3 class="text-2xl font-bold tracking-tight mb-2">Cognitive Core Offline</h3>
+    <p class="text-slate-500 max-w-xs mx-auto text-sm leading-relaxed">Hệ thống chưa có dữ liệu. Vui lòng nhấn RUN SYSTEM SETUP để nạp dữ liệu cục bộ.</p>
+</div>
+{% else %}
+<!-- Active Dashboard -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+    <div class="card glass-morphism card-hover p-6 border-white/5" data-aos="fade-up" data-aos-delay="100">
+        <div class="flex items-start justify-between mb-5">
+            <div class="p-3 bg-primary/10 rounded-2xl"><i data-lucide="users" class="w-5 h-5 text-primary"></i></div>
+            <span class="text-[9px] font-black text-primary bg-primary/10 px-2 py-1 rounded-lg uppercase tracking-wider">Active</span>
+        </div>
+        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-1">Total Students</p>
+        <h2 class="text-4xl font-black tracking-tighter counter" data-target="{{ total_students }}">0</h2>
+    </div>
+    <div class="card glass-morphism card-hover p-6 border-white/5" data-aos="fade-up" data-aos-delay="200">
+        <div class="flex items-start justify-between mb-5">
+            <div class="p-3 bg-accent/10 rounded-2xl"><i data-lucide="book-marked" class="w-5 h-5 text-accent"></i></div>
+            <span class="text-[9px] font-black text-accent bg-accent/10 px-2 py-1 rounded-lg uppercase tracking-wider">Synced</span>
+        </div>
+        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-1">Total Courses</p>
+        <h2 class="text-4xl font-black tracking-tighter counter" data-target="{{ total_courses }}">0</h2>
+    </div>
+    <div class="card glass-morphism card-hover p-6 border-white/5" data-aos="fade-up" data-aos-delay="300">
+        <div class="flex items-start justify-between mb-5">
+            <div class="p-3 bg-danger/10 rounded-2xl"><i data-lucide="shield-alert" class="w-5 h-5 text-danger"></i></div>
+            <span class="text-[9px] font-black text-danger bg-danger/10 px-2 py-1 rounded-lg uppercase tracking-wider">Risk</span>
+        </div>
+        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-1">Risk Factors</p>
+        <h2 class="text-4xl font-black tracking-tighter counter" data-target="{{ at_risk_count }}">0</h2>
+    </div>
+    <div class="card glass-morphism card-hover p-6 border-white/5" data-aos="fade-up" data-aos-delay="400">
+        <div class="flex items-start justify-between mb-5">
+            <div class="p-3 bg-success/10 rounded-2xl"><i data-lucide="radio" class="w-5 h-5 text-success animate-pulse"></i></div>
+            <span class="text-[9px] font-black text-success bg-success/10 px-2 py-1 rounded-lg uppercase tracking-wider">Stable</span>
+        </div>
+        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-1">System Mode</p>
+        <h2 class="text-4xl font-black tracking-tighter text-success">Local</h2>
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Nav Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6" data-aos="fade-up" data-aos-offset="0">
+    <a href="/students" class="group p-8 glass-morphism rounded-[2.5rem] hover:border-primary/50 transition-all text-center border-white/5">
+        <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:bg-primary/20 transition-colors">
+            <i data-lucide="users" class="w-6 h-6 text-slate-400 group-hover:text-primary transition-colors"></i>
+        </div>
+        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 group-hover:text-white">Students</span>
+    </a>
+    <a href="/courses" class="group p-8 glass-morphism rounded-[2.5rem] hover:border-accent/50 transition-all text-center border-white/5">
+        <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:bg-accent/20 transition-colors">
+            <i data-lucide="book-marked" class="w-6 h-6 text-slate-400 group-hover:text-accent transition-colors"></i>
+        </div>
+        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 group-hover:text-white">Courses</span>
+    </a>
+    <a href="/analysis" class="group p-8 glass-morphism rounded-[2.5rem] hover:border-primary/50 transition-all text-center border-white/5">
+        <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:bg-primary/20 transition-colors">
+            <i data-lucide="bar-chart-horizontal" class="w-6 h-6 text-slate-400 group-hover:text-primary transition-colors"></i>
+        </div>
+        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 group-hover:text-white">Analysis</span>
+    </a>
+    <a href="/predictions" class="group p-8 glass-morphism rounded-[2.5rem] hover:border-warning/50 transition-all text-center border-white/5">
+        <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:bg-warning/20 transition-colors">
+            <i data-lucide="target" class="w-6 h-6 text-slate-400 group-hover:text-warning transition-colors"></i>
+        </div>
+        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 group-hover:text-white">AI Intel</span>
+    </a>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function animateCounters() {
+        document.querySelectorAll('.counter').forEach(c => {
+            const t = +c.getAttribute('data-target');
+            gsap.to(c, { innerText: t, duration: 2.5, snap: { innerText: 1 }, ease: "power4.out" });
+        });
+    }
+    document.addEventListener('DOMContentLoaded', animateCounters);
+
+    async function startGlobalScrape() {
+        const bar = document.getElementById('setup-bar');
+        const status = document.getElementById('setup-status');
+        const percent = document.getElementById('setup-percent');
+        const progress = document.getElementById('setup-progress');
+
+        progress.style.display = 'block';
+        gsap.to(bar, { width: '20%', duration: 1.2, ease: "expo.out" });
+        percent.innerText = "20%";
+        status.innerText = "NẠP HỆ THỐNG LOCAL...";
+
+        try {
+            const response = await fetch('/api/scrape', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({})
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                gsap.to(bar, { width: '100%', duration: 1, ease: "power4.inOut" });
+                percent.innerText = "100%";
+                status.innerText = "ĐỒNG BỘ HOÀN TẤT. ĐANG TẢI LẠI...";
+
+                setTimeout(() => window.location.reload(), 1200);
+            } else {
+                status.innerText = "LỖI: " + data.message;
+                status.style.color = "#ef4444";
+            }
+        } catch (error) {
+            status.innerText = "LỖI KẾT NỐI";
+            status.style.color = "#ef4444";
+        }
+    }
+</script>
+{% endblock %}

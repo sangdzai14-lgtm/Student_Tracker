@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Node Intelligence | About AI 2026{% endblock %}
+
+{% block content %}
+<div class="mb-12" data-aos="fade-down">
+    <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20 mb-4">
+        <i data-lucide="info" class="w-3.5 h-3.5 text-primary"></i>
+        <span class="text-[10px] font-black uppercase tracking-widest text-primary">Protocol Information</span>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-black tracking-tighter mb-4">
+        Academic <span class="animated-gradient-text">Intelligence Core</span>
+    </h1>
+    <p class="text-slate-500 font-medium max-w-xl">Project TEC-004: Advanced Autonomous Academic Monitoring System (Live Edition 2026).</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
+    <div class="card glass-morphism p-12 border-white/5 space-y-8" data-aos="fade-right">
+        <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Technical Foundation</h5>
+
+        <div class="space-y-12">
+            <div class="flex gap-6">
+                <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-primary border border-white/10 shadow-lg"><i data-lucide="terminal" class="w-6 h-6"></i></div>
+                <div>
+                    <h6 class="font-black text-white uppercase text-xs tracking-widest mb-2">Backend Architecture</h6>
+                    <p class="text-[11px] text-slate-500 leading-relaxed font-medium">Built on Python 3.12 and Flask 3.0, utilizing multi-threaded processing for simultaneous scraping and analysis operations.</p>
+                </div>
+            </div>
+
+            <div class="flex gap-6">
+                <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-accent border border-white/10 shadow-lg"><i data-lucide="database-zap" class="w-6 h-6"></i></div>
+                <div>
+                    <h6 class="font-black text-white uppercase text-xs tracking-widest mb-2">Neural Database Core</h6>
+                    <p class="text-[11px] text-slate-500 leading-relaxed font-medium">SQLite-based persistence layer with automated synchronization bridges to PTIT's unstructured web repositories.</p>
+                </div>
+            </div>
+
+            <div class="flex gap-6">
+                <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-success border border-white/10 shadow-lg"><i data-lucide="binary" class="w-6 h-6"></i></div>
+                <div>
+                    <h6 class="font-black text-white uppercase text-xs tracking-widest mb-2">Data Intelligence</h6>
+                    <p class="text-[11px] text-slate-500 leading-relaxed font-medium">Pandas 2.0 vectorized computations and Scikit-Learn linear regression models for high-fidelity predictive modeling.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-8" data-aos="fade-left">
+        <div class="card glass-morphism p-10 border-white/5 bg-gradient-to-br from-white/[0.03] to-transparent">
+            <h5 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-8">System Manifesto</h5>
+            <p class="text-slate-400 leading-relaxed text-sm italic font-medium">
+                "The goal of TEC-004 is to bridge the gap between unstructured educational data and actionable academic intelligence, providing a unified portal for high-fidelity performance monitoring."
+            </p>
+            <div class="flex items-center gap-4 mt-12 pt-12 border-t border-white/5 opacity-40">
+                <div class="w-10 h-10 rounded-full bg-slate-800"></div>
+                <div>
+                    <p class="text-[10px] font-black text-white uppercase">System Architect</p>
+                    <p class="text-[9px] text-slate-600 font-bold uppercase tracking-widest">A.I. Core Terminal v4.0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+            <div class="p-6 glass-morphism rounded-3xl border-white/5 text-center">
+                <h3 class="text-3xl font-black text-white mb-1">99.9%</h3>
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Logic Uptime</p>
+            </div>
+            <div class="p-6 glass-morphism rounded-3xl border-white/5 text-center text-primary border-primary/20">
+                <h3 class="text-3xl font-black text-primary mb-1">2026</h3>
+                <p class="text-[9px] font-black text-primary/50 uppercase tracking-widest">Design Epoch</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
