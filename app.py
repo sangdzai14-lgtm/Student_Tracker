@@ -179,6 +179,16 @@ def serve_viz(filename):
     if os.path.exists(path): return send_file(path)
     return "File Missing", 404
 
+@app.route('/health')
+def health_check():
+    """System Health Endpoint"""
+    return jsonify({
+        'status': 'healthy',
+        'database': 'connected' if db else 'error',
+        'api_base': API_BASE_URL,
+        'version': '10.7-public'
+    }), 200
+
 if __name__ == '__main__':
     os.makedirs('static/visualizations', exist_ok=True)
     # 🔑 BIND TO 0.0.0.0 FOR PUBLIC ACCESS
