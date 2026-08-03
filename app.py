@@ -1,11 +1,12 @@
 """
-🚀 LOCAL CORE ENGINE v10.2: longitudinal Analysis Node
+🚀 LOCAL CORE ENGINE v10.2: longitudinal Analysis Node (Public Access Enabled)
 --------------------------------------------------
 - Pivot: Replaced Supabase with Local SQLite.
 - Evolution: Multi-year subject tracking and Cohort mapping.
-- Visuals: On-demand Matplotlib generation for course details.
+- Public: Integrated Cloudflare Tunnel & Dynamic API Base URL.
 """
 from flask import Flask, render_template, request, jsonify, redirect, url_for, send_file
+from flask_cors import CORS
 from database import Database
 from analytics import GradeAnalytics, VisualizationData
 from ai_agents import AIAgentOrchestrator
@@ -14,12 +15,16 @@ from data_persistence import DataPersistence
 import json
 import os
 import logging
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'local_academic_intel_2026'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'local_academic_intel_2026')
+CORS(app) # Enable CORS for public internet access
 
 db = Database('student_tracker.db')
 analytics = GradeAnalytics(db)
@@ -27,6 +32,13 @@ agents = AIAgentOrchestrator()
 viz_data = VisualizationData(analytics)
 pipeline = DataPipeline()
 persistence = DataPersistence()
+
+# Global variables for public URL handling
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:5000")
+
+@app.context_processor
+def inject_api_url():
+    return dict(api_base_url=API_BASE_URL)
 
 @app.route('/')
 def index():
@@ -77,7 +89,6 @@ def courses_list():
         for c in filtered:
             st = analytics.get_course_statistics(c['course_id'])
             c_copy = dict(c)
-            # Ensure display_name is present even when filtered
             base = c['course_name'].split(' (')[0]
             c_copy.update({'avg_grade': st['avg_grade'], 'student_count': st['student_count'], 'pass_rate': st['pass_rate'], 'display_name': base})
             display_courses.append(c_copy)
@@ -88,15 +99,9 @@ def course_detail(course_id):
     all_c = db.get_all_courses()
     target = next((c for c in all_c if c['course_id'] == course_id), None)
     if not target: return "Module missing", 404
-
-    # 🔑 FIX: Robust historical mapping (Match by Code or Base Name)
-    # Extracts 'AI101' from 'AI101_K21_2021_2022_S1'
     subject_code = target['course_id'].split('_')[0]
     base_name = target['course_name'].split(' (')[0]
-
-    # Match courses that share the same subject code OR name prefix
     history = [c for c in all_c if c['course_id'].startswith(subject_code) or c['course_name'].startswith(base_name)]
-
     history_stats = []
     for h in history:
         st = analytics.get_course_statistics(h['course_id'])
@@ -107,13 +112,8 @@ def course_detail(course_id):
             'id': h['course_id'],
             'cohort': h['course_name'].split('(')[1].split(')')[0] if '(' in h['course_name'] else '?'
         })
-
-    # Sort history chronologically
     history_stats.sort(key=lambda x: (x['year'], x['semester']))
-
-    # 📊 NEW: Generate Course Distribution Chart (Matplotlib)
     dist_img = analytics.generate_course_distribution_chart(course_id)
-
     return render_template('course_detail.html',
                          course=target,
                          grades=db.get_course_grades(course_id),
@@ -181,4 +181,5 @@ def serve_viz(filename):
 
 if __name__ == '__main__':
     os.makedirs('static/visualizations', exist_ok=True)
-    app.run(debug=True, port=5000, host='0.0.0.0', use_reloader=False)
+    # 🔑 BIND TO 0.0.0.0 FOR PUBLIC ACCESS
+    app.run(debug=False, port=5000, host='0.0.0.0', use_reloader=False)
