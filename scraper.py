@@ -3,7 +3,7 @@
 --------------------------------------------------
 - Pivot: Solidifies 5 distinct cohorts (K21 -> K25).
 - Structure: Guaranteed unique subject naming (No duplication).
-- Reality: Fixed 200 student population with persistent academic traits.
+- Reality: Fixed student population with persistent academic traits.
 """
 import random
 import unicodedata
@@ -13,6 +13,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 class BacDuyUniversityScraper:
+    """Scraper node for generating high-fidelity academic datasets"""
+
     def __init__(self):
         self.base_url = "https://truong-dai-hoc-bac-duy-thai-nguyen-diem.lovable.app/"
         self.subjects_meta = [
@@ -38,13 +40,16 @@ class BacDuyUniversityScraper:
             "K25": self._generate_cohort("BD25AI", 40)
         }
         self.fixed_student_pool = []
-        for c in self.cohorts.values(): self.fixed_student_pool.extend(c)
+        for c in self.cohorts.values():
+            self.fixed_student_pool.extend(c)
 
     def _remove_accents(self, input_str):
+        """Normalize string to remove Vietnamese accents for technical fields"""
         nfkd_form = unicodedata.normalize('NFKD', input_str)
         return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
     def _generate_cohort(self, prefix: str, count: int) -> List[Dict]:
+        """Generate a unique set of student identities for a specific cohort"""
         pool = []
         v_first = ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Huỳnh", "Phan", "Vũ", "Võ", "Đặng", "Bùi", "Đỗ", "Hồ", "Ngô", "Dương", "Lý"]
         v_middle = ["Văn", "Thị", "Minh", "Đức", "Thanh", "Anh", "Xuân", "Hải", "Tuấn", "Thành", "Quang", "Ngọc", "Kim", "Hữu"]
@@ -64,6 +69,7 @@ class BacDuyUniversityScraper:
         return pool
 
     def scrape_all_academic_records(self) -> List[Dict[str, Any]]:
+        """Map curriculum structure to academic years and semesters"""
         all_records = []
         years = ["2021/2022", "2022/2023", "2023/2024", "2024/2025", "2025/2026"]
 
@@ -76,7 +82,7 @@ class BacDuyUniversityScraper:
                 if 1 <= level <= 4:
                     level_subjects = [s for s in self.subjects_meta if s['code'].startswith(f"AI{level}")]
                     for sem in [1, 2]:
-                        # Reliably split subjects (e.g., AI101,102 in S1; AI103,104 in S2)
+                        # Balance subjects across semesters
                         sub_pool = level_subjects[:len(level_subjects)//2] if sem == 1 else level_subjects[len(level_subjects)//2:]
 
                         for sub in sub_pool:
@@ -92,14 +98,20 @@ class BacDuyUniversityScraper:
         return all_records
 
     def _generate_grades(self, student_pool: List[Dict]) -> List[Dict]:
+        """Synthesize performance data based on individual student traits"""
         students = []
         for stu in student_pool:
             t = stu['trait']
-            if t == 'excellent': att, ass, mid, final = random.uniform(94,100), random.uniform(9.4,10), random.uniform(9,10), random.uniform(9,10)
-            elif t == 'talented_but_lazy': att, ass, mid, final = random.uniform(40,65), random.uniform(7,9.2), random.uniform(8.5,10), random.uniform(8.5,10)
-            elif t == 'diligent_but_low': att, ass, mid, final = random.uniform(96,100), random.uniform(9,10), random.uniform(3,5.5), random.uniform(3,5.5)
-            elif t == 'struggling': att, ass, mid, final = random.uniform(40,75), random.uniform(2,5), random.uniform(1.5,4.5), random.uniform(1,4.5)
-            else: att, ass, mid, final = random.uniform(70,95), random.uniform(6.5,8.8), random.uniform(5.5,8), random.uniform(5,8)
+            if t == 'excellent':
+                att, ass, mid, final = random.uniform(94,100), random.uniform(9.4,10), random.uniform(9,10), random.uniform(9,10)
+            elif t == 'talented_but_lazy':
+                att, ass, mid, final = random.uniform(40,65), random.uniform(7,9.2), random.uniform(8.5,10), random.uniform(8.5,10)
+            elif t == 'diligent_but_low':
+                att, ass, mid, final = random.uniform(96,100), random.uniform(9,10), random.uniform(3,5.5), random.uniform(3,5.5)
+            elif t == 'struggling':
+                att, ass, mid, final = random.uniform(40,75), random.uniform(2,5), random.uniform(1.5,4.5), random.uniform(1,4.5)
+            else:
+                att, ass, mid, final = random.uniform(70,95), random.uniform(6.5,8.8), random.uniform(5.5,8), random.uniform(5,8)
 
             fg = round(((att/10)*0.2) + (ass*0.3) + (final*0.5), 1)
             letter = 'F'
@@ -107,10 +119,12 @@ class BacDuyUniversityScraper:
             elif fg >= 7.0: letter = 'B'
             elif fg >= 5.5: letter = 'C'
             elif fg >= 4.0: letter = 'D'
-            rec = stu.copy(); rec.update({'midterm': round(mid,1), 'final': round(final,1), 'assignments': round(ass,1), 'attendance': round(att,1), 'final_grade': fg, 'letter_grade': letter})
+
+            rec = stu.copy()
+            rec.update({'midterm': round(mid,1), 'final': round(final,1), 'assignments': round(ass,1), 'attendance': round(att,1), 'final_grade': fg, 'letter_grade': letter})
             students.append(rec)
         return students
 
-# Compatibility Layer
+# Deprecated/Compatibility Wrappers
 class PTITScraper(BacDuyUniversityScraper): pass
 class BacSonScraper(BacDuyUniversityScraper): pass
